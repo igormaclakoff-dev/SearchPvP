@@ -1,0 +1,177 @@
+# ==========================================================
+#  SearchPvP  |  messages.yml
+#  Full MiniMessage support (https://docs.advntr.dev/minimessage/format.html)
+#  Available placeholders are documented per group.
+# ==========================================================
+
+prefix: "<gradient:#7B2FF7:#00D4FF><bold>SearchPvP</bold></gradient> <dark_gray>»</dark_gray> "
+
+# Plain-text units used by the season countdown (days / hours / minutes).
+time:
+  days: "дн."
+  hours: "ч"
+  minutes: "м"
+
+tiers:
+  netherite: "Незерит"
+  diamond: "Алмаз"
+
+command:
+  player-only: "<prefix><red>Команда доступна только игрокам."
+  no-permission: "<prefix><red>Недостаточно прав."
+  usage-admin: "<prefix><gray>Используй <white>/pvpadmin help</white> <gray>для списка команд."
+  unknown-subcommand: "<prefix><red>Неизвестная подкоманда: <white><arg>"
+  help:
+    - "<gradient:#7B2FF7:#00D4FF><bold>✦ SearchPvP</bold></gradient> <dark_gray>» <gray>помощь по командам"
+    - ""
+    - "<gradient:#00FF87:#00D4FF><bold>▸ Игрокам"
+    - "<dark_gray>▏ <white>/pvp <dark_gray>- <gray>открыть меню арен"
+    - "<dark_gray>▏ <white>/pvp cancel <dark_gray>- <gray>отменить поиск противника"
+    - "<dark_gray>▏ <white>/top <dark_gray>- <gray>топ игроков сезона"
+    - ""
+    - "<gradient:#FFD700:#FF8A00><bold>▸ Администрация"
+    - "<dark_gray>▏ <white>/pvpadmin reload <dark_gray>- <gray>перезагрузить конфиги"
+    - "<dark_gray>▏ <white>/pvpadmin setpvpcommand <команда> <dark_gray>- <gray>PvP-команда (вкл. режим)"
+    - "<dark_gray>▏ <white>/pvpadmin season info <dark_gray>- <gray>инфо о сезоне"
+    - "<dark_gray>▏ <white>/pvpadmin season set <номер> <dark_gray>- <gray>установить номер сезона"
+    - "<dark_gray>▏ <white>/pvpadmin season reset <dark_gray>- <gray>новый сезон (сброс рейтинга)"
+    - "<dark_gray>▏ <white>/pvpadmin season finish <dark_gray>- <gray>завершить сезон сейчас"
+    - "<dark_gray>▏ <white>/pvpadmin forcestop <игрок> <dark_gray>- <gray>остановить поиск/бой"
+    - "<dark_gray>▏ <white>/pvpadmin forcesearch <игрок> <dark_gray>- <gray>запустить поиск игроку"
+    - "<dark_gray>▏ <white>/pvpadmin setelo <игрок> <число> <dark_gray>- <gray>установить рейтинг"
+    - "<dark_gray>▏ <white>/pvpadmin reward <1-3> <line|command|info> <dark_gray>- <gray>награды топ-3"
+    - ""
+    - "<dark_gray>▏ <gray>Плейсхолдеры в командах: <white>%name%</white>/<white><name></white>, <white>%elo%</white>, <white>%place%</white>"
+  reloaded: "<prefix><green>Конфигурация перезагружена."
+  pvpcommand-set: "<prefix><green>Команда PvP-режима обновлена: <white><value>"
+  setelo-done: "<prefix><green>Рейтинг игрока <white><player></white> установлен на <white><elo></white>."
+  setelo-unknown: "<prefix><red>Игрок <white><player></white> не найден."
+  forcestop-done: "<prefix><green>Поиск/бой игрока <white><player></white> остановлен."
+  forcestop-none: "<prefix><red>Игрок <white><player></white> не в поиске и не в бою."
+  forcesearch-done: "<prefix><green>Игрок <white><player></white> <gray>принудительно отправлен в поиск."
+  forcesearch-fail: "<prefix><red>Не удалось запустить поиск для <white><player></white> <gray>(нет брони, уже в поиске или в бою)."
+  season-info: "<prefix><gray>Сезон <white><season></white>, осталось <white><time></white>."
+  season-reset: "<prefix><green>Сезон перезапущен. Начался сезон <white><season></white>."
+  season-set: "<prefix><green>Установлен сезон <white><season></white> (таймер перезапущен)."
+  season-set-usage: "<prefix><gray>Использование: <white>/pvpadmin season set <номер>"
+  season-finished: "<prefix><green>Сезон завершён вручную. Идёт сезон <white><season></white>."
+  reward-usage: "<prefix><gray>Использование: <white>/pvpadmin reward <1-3> <line|command|info> <add|remove|clear> [значение]"
+  reward-bad-place: "<prefix><red>Место должно быть числом от <white>1</white> до <white>3</white>."
+  reward-line-added: "<prefix><green>Строка описания добавлена к награде за место <white>#<place></white>."
+  reward-line-removed: "<prefix><green>Строка <white>#<index></white> удалена из награды за место <white>#<place></white>."
+  reward-line-cleared: "<prefix><green>Строки награды за место <white>#<place></white> очищены."
+  reward-command-added: "<prefix><green>Команда добавлена к награде за место <white>#<place></white>."
+  reward-command-removed: "<prefix><green>Команда <white>#<index></white> удалена из награды за место <white>#<place></white>."
+  reward-command-cleared: "<prefix><green>Команды награды за место <white>#<place></white> очищены."
+  reward-index-missing: "<prefix><red>Запись с номером <white>#<index></white> не найдена."
+  reward-info-header: "<prefix><gray>Награда за место <white>#<place></white>:"
+  reward-info-entry: "<dark_gray>  <white><index>.</white> <gray><value>"
+  reward-info-command: "<dark_gray>  <gold>⚙</gold> <white><index>.</white> <gray><value>"
+  reward-info-empty: "<dark_gray>  <gray>— пусто —"
+
+search:
+  started: "<prefix><gray>Поиск противника запущен. Уровень брони: <white><tier><gray>."
+  already: "<prefix><red>Ты уже находишься в поиске противника."
+  in-match: "<prefix><red>Ты уже находишься в бою."
+  need-armor: "<prefix><red>Для поиска нужен полный сет <white>незерита</white> или <white>алмаза</white> <gray>(шлем, нагрудник, штаны, ботинки)."
+  tier-disabled: "<prefix><red>Поиск для уровня <white><tier></white> сейчас отключён."
+  bossbar: "<gradient:#7B2FF7:#00D4FF>Поиск противника...</gradient> <dark_gray>|</dark_gray> <gray><tier>"
+  actionbar: "<gray>Сканирование арен..."
+  broadcast-started: "<prefix><white><player></white> <gray>начал поиск противника <dark_gray>(<white><tier></white>)</dark_gray>."
+  broadcast-cancelled: "<prefix><white><player></white> <gray>отменил поиск."
+  cancelled-armor: "<prefix><red>Поиск отменён: броня не была восстановлена вовремя."
+  cancelled-manual: "<prefix><gray>Поиск противника отменён."
+  not-searching: "<prefix><red>Ты не находишься в поиске противника."
+  armour-title: "<red><bold>ВЕРНИ БРОНЮ"
+  armour-subtitle: "<gray>Поиск отменится через <white><seconds>с"
+  armour-restored: "<prefix><green>Броня восстановлена, поиск продолжается."
+
+match:
+  found: "<prefix><green>Противник найден: <white><opponent></white><green>. Уровень: <white><tier><green>."
+  found-broadcast: "<prefix><white><first></white> <gray>и</gray> <white><second></white> <gray>вступают в бой!"
+  countdown: "<gradient:#FFD700:#FF2D55><bold><seconds>"
+  countdown-sub: "<gray>Приготовься к бою"
+  go: "<gradient:#00FF87:#00D4FF><bold>В БОЙ!"
+  go-sub: "<gray>Удачи!"
+  won: "<prefix><green>Победа! <gray>Рейтинг: <white><elo></white> <dark_gray>(<white><change></white>)"
+  lost: "<prefix><red>Поражение. <gray>Рейтинг: <white><elo></white> <dark_gray>(<white><change></white>)"
+  broadcast-result: "<prefix><white><winner></white> <gray>победил</gray> <white><loser></white> <dark_gray>(<white><winner_elo></white> vs <white><loser_elo></white>)</dark_gray>"
+  aborted: "<prefix><red>Бой отменён."
+
+menu:
+  title: "<dark_gray>SearchPvP <dark_gray>| <gray>Меню"
+  stats:
+    name: "<gradient:#7B2FF7:#00D4FF><bold><player></bold></gradient>"
+    lore:
+      - "<dark_gray>▏ <gray>Рейтинг: <white><elo>"
+      - "<dark_gray>▏ <gray>Ранг: <white><rank>"
+      - "<dark_gray>▏ <gray>Сезон: <white><season>"
+      - ""
+      - "<dark_gray>▏ <green>Победы: <white><wins>"
+      - "<dark_gray>▏ <red>Поражения: <white><losses>"
+      - "<dark_gray>▏ <gray>Матчи: <white><matches> <dark_gray>|<gray> Винрейт: <white><winrate>%"
+      - ""
+      - "<dark_gray>▏ <gray>Убийства: <white><kills>"
+      - "<dark_gray>▏ <gray>Смерти: <white><deaths>"
+      - "<dark_gray>▏ <gray>K/D: <white><kd>"
+      - ""
+      - "<dark_gray>▏ <gold>Серия побед: <white><streak> <dark_gray>(рекорд: <white><best_streak></white>)"
+  search:
+    name: "<gradient:#00FF87:#00D4FF><bold>Начать поиск</bold></gradient>"
+    lore:
+      - "<dark_gray>▏ <gray>Нужен полный сет брони:"
+      - "<dark_gray>▏ <white>• Незерит</white> или <white>• Алмаз"
+      - ""
+      - "<dark_gray>▏ <gray>Смена брони во время поиска"
+      - "<dark_gray>▏ <gray>отменит поиск через <white>10с</white>."
+      - ""
+      - "<dark_gray>▏ <yellow>Нажми, чтобы найти противника!"
+  cancel:
+    name: "<gradient:#FF2D55:#FF8A00><bold>Отменить поиск</bold></gradient>"
+    lore:
+      - "<dark_gray>▏ <gray>Ты в поиске противника."
+      - "<dark_gray>▏ <gray>Уровень брони: <white><tier>"
+      - ""
+      - "<dark_gray>▏ <yellow>Нажми, чтобы отменить поиск."
+  top:
+    name: "<gradient:#FFD700:#FF8A00><bold>Топ игроков</bold></gradient>"
+    lore:
+      - "<dark_gray>▏ <gray>Лучшие бойцы сезона <white><season>"
+      - ""
+      - "<dark_gray>▏ <yellow>Нажми, чтобы открыть топ!"
+  season:
+    name: "<gradient:#00D4FF:#7B2FF7><bold>Сезон <season></bold></gradient>"
+    lore:
+      - "<dark_gray>▏ <gray>До конца сезона: <white><time>"
+      - ""
+      - "<dark_gray>▏ <gray>Рейтинг сбрасывается в конце сезона."
+  close:
+    name: "<red><bold>Закрыть</bold>"
+    lore:
+      - "<dark_gray>▏ <gray>Нажми, чтобы закрыть меню."
+
+top:
+  title: "<dark_gray>Топ игроков <dark_gray>| <gray>Стр. <page>"
+  entry-name: "<yellow>#<position> <white><player>"
+  entry-lore:
+    - "<dark_gray>▏ <gray>Рейтинг: <white><elo>"
+    - "<dark_gray>▏ <gray>Ранг: <white><rank>"
+    - "<dark_gray>▏ <green>Победы: <white><wins> <dark_gray>|<red> Поражения: <white><losses>"
+  reward-name: "<gradient:#FFD700:#FF8A00><bold>🏆 Награды сезона</bold></gradient>"
+  reward-place: "<dark_gray>▏ <yellow>#<place> <white><player>"
+  reward-line: "<dark_gray>  ▏ <gray><line>"
+  reward-none: "<dark_gray>  ▏ <dark_gray>———"
+  previous: "<gray>◀ Предыдущая"
+  next: "<gray>Следующая ▶"
+  back: "<gray>Назад в меню"
+  page-info: "<gray>Страница <white><page>"
+  empty: "<red>Пока нет данных о боях."
+
+season:
+  countdown: "<prefix><gold>⏳ До конца сезона осталось <white><time></white>!"
+  ended-header: "<dark_gray>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+  ended-title: "<gradient:#FFD700:#FF2D55><bold>✦ СЕЗОН <season> ЗАВЕРШЁН! ✦</bold></gradient>"
+  ended-empty: "<prefix><gray>Победителей нет — сезон завершён без наград."
+  ended-winner: "<yellow>  #<place> <white><player> <dark_gray>(<white><elo></white> <gray>рейтинг<dark_gray>)"
+  ended-reward: "<dark_gray>     ▏ <gray><line>"
+  ended-footer: "<prefix><green>Награды выданы! Стартует новый сезон <white><next></white>."

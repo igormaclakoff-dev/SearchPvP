@@ -1,0 +1,51 @@
+name: SearchPvP
+version: '${project.version}'
+main: com.auracode.searchpvp.SearchPvPPlugin
+api-version: '1.21'
+authors: [AuraCode]
+description: Ranked PvP matchmaking with armor tiers, ELO rating and seasons.
+website: https://auracode.dev
+
+commands:
+  pvp:
+    description: Open the SearchPvP menu.
+    usage: /pvp
+    aliases: [ranked, arenapvp]
+  top:
+    description: Show the SearchPvP leaderboard.
+    usage: /top
+    aliases: [pvptop, leaderboard]
+  pvpadmin:
+    description: SearchPvP administration.
+    usage: /pvpadmin help
+    aliases: [spvpadmin, searchpvp]
+
+permissions:
+  searchpvp.use:
+    description: Access to the /pvp menu and matchmaking.
+    default: true
+  searchpvp.admin:
+    description: Access to all /pvpadmin subcommands.
+    default: op
+    children:
+      searchpvp.command.reload: true
+      searchpvp.command.setpvpcommand: true
+      searchpvp.command.season: true
+      searchpvp.command.forcestop: true
+      searchpvp.command.forcesearch: true
+      searchpvp.command.setelo: true
+      searchpvp.command.reward: true
+  searchpvp.command.reload:
+    default: op
+  searchpvp.command.setpvpcommand:
+    default: op
+  searchpvp.command.season:
+    default: op
+  searchpvp.command.forcestop:
+    default: op
+  searchpvp.command.forcesearch:
+    default: op
+  searchpvp.command.setelo:
+    default: op
+  searchpvp.command.reward:
+    default: op

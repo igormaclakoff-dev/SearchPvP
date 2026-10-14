@@ -1,0 +1,76 @@
+# ==========================================================
+#  SearchPvP  |  AuraCode
+#  Ranked PvP matchmaking: armor tiers, ELO, seasons.
+# ==========================================================
+
+settings:
+  # Command executed (as console) to enable PvP mode for a player.
+  # The placeholder %name% is replaced with the player's name.
+  # Example: "pvp give %name%"
+  placement-command: "pvp give %name%"
+
+arena:
+  # World used for arenas. Falls back to the first loaded world if missing.
+  world: "world"
+  # Random arena location distance from world origin (in blocks).
+  min-distance: 2000
+  max-distance: 5000
+  # If true both fighters are teleported to the same spot (offset by spawn-offset).
+  same-location: true
+  # Block offset between the two fighters when same-location is true.
+  spawn-offset: 3
+  # How many attempts to find a safe surface block before falling back to spawn.
+  max-attempts: 40
+
+matchmaking:
+  # Ticks between matchmaking iterations (20 ticks = 1 second).
+  interval-ticks: 20
+  # Armor tiers that are allowed to queue.
+  allowed-tiers:
+    - NETHERITE
+    - DIAMOND
+  # Grace period (seconds) to restore changed/removed armor before the search is cancelled.
+  armor-change-grace-seconds: 10
+
+elo:
+  # Rating every new player starts with.
+  starting-rating: 1000
+  # K-factor of the Elo algorithm.
+  k-factor: 32
+
+season:
+  # Length of a season in days. When it ends, ratings reset automatically.
+  length-days: 30
+
+match:
+  # Countdown in seconds before a fight starts (players are frozen meanwhile).
+  countdown-seconds: 3
+  # Teleport players back to where they were before the fight.
+  return-to-origin: true
+  # Keep inventory & XP on death inside an arena.
+  keep-inventory: true
+
+rewards:
+  # Optional command executed (as console) for the winner. Use %name% and %elo%.
+  win-command: ""
+  # Optional command executed (as console) for the loser. Use %name% and %elo%.
+  lose-command: ""
+
+# ==========================================================
+#  Season top-3 rewards.
+#   - lines:    description lines shown to players (in /top and in the end announcement).
+#   - commands: executed automatically (as console) when the season ends.
+#  Supported placeholders: %name% (or <name>), %elo%, %place%.
+#  Leave both lists empty to disable rewards for that place.
+#  Manage them in-game with: /pvpadmin reward <1-3> <line|command> <add|remove|clear>
+# ==========================================================
+season-rewards:
+  1:
+    lines: []
+    commands: []
+  2:
+    lines: []
+    commands: []
+  3:
+    lines: []
+    commands: []
