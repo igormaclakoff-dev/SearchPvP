@@ -121,14 +121,14 @@ arena:
   min-distance: 2000      # минимальное расстояние от центра мира
   max-distance: 5000      # максимальное расстояние
   same-location: true     # телепортировать бойцов рядом
-  spawn-offset: 5         # смещение между бойцами (при same-location)
+  spawn-offset: 3         # смещение между бойцами (при same-location)
 
 matchmaking:
   interval-ticks: 20      # частота обработки очереди
   armor-change-grace-seconds: 10   # время на восстановление брони
 
 elo:
-  starting-elo: 1000      # стартовый рейтинг
+  starting-rating: 1000   # стартовый рейтинг
   k-factor: 32            # коэффициент K
 
 season:
@@ -136,8 +136,14 @@ season:
 
 match:
   countdown-seconds: 3    # отсчёт перед боем
+  min-rank-seconds: 15    # минимальная длительность боя для зачёта рейтинга при выходе
   return-to-origin: true  # вернуть игроков на исходное место
   keep-inventory: true    # сохранять инвентарь в бою
+
+rewards:
+  win-command: ""         # команда за победу (%name%, %elo%)
+  lose-command: ""        # команда за поражение (%name%, %elo%)
+  exit-command: ""        # команда обоим бойцам в конце боя (например, выключить PvP-режим)
 
 # Награды топ-3 сезона (выдаются автоматически в конце сезона)
 season-rewards:

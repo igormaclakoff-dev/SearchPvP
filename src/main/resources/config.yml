@@ -45,6 +45,9 @@ season:
 match:
   # Countdown in seconds before a fight starts (players are frozen meanwhile).
   countdown-seconds: 3
+  # Minimum fight duration (seconds) before a ranked ELO change is applied on a quit.
+  # Prevents abusing instant disconnects to farm rating.
+  min-rank-seconds: 15
   # Teleport players back to where they were before the fight.
   return-to-origin: true
   # Keep inventory & XP on death inside an arena.
@@ -55,6 +58,8 @@ rewards:
   win-command: ""
   # Optional command executed (as console) for the loser. Use %name% and %elo%.
   lose-command: ""
+  # Optional command executed (as console) for both fighters when a fight ends (e.g. to disable PvP mode).
+  exit-command: ""
 
 # ==========================================================
 #  Season top-3 rewards.

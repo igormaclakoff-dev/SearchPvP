@@ -24,10 +24,13 @@ public final class DataManager {
     private final SearchPvPPlugin plugin;
     private final File file;
     private final Map<UUID, PlayerData> cache = new ConcurrentHashMap<>();
+    private final Object saveLock = new Object();
+
+    private volatile boolean saveScheduled;
 
     public DataManager(SearchPvPPlugin plugin) {
         this.plugin = plugin;
-        this.file = new File(plugin.getDataFolder(), "playerdata.yml");
+        this.file = new File(plugin.getDataFolder(), "player-data.yml");
     }
 
     public void load() {
@@ -88,21 +91,30 @@ public final class DataManager {
     }
 
     public void save() {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, this::saveSync);
+        if (saveScheduled) {
+            return;
+        }
+        saveScheduled = true;
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            saveScheduled = false;
+            saveSync();
+        });
     }
 
     public void saveSync() {
-        YamlConfiguration yaml = new YamlConfiguration();
-        for (PlayerData data : cache.values()) {
-            data.write(yaml.createSection(ROOT + "." + data.uuid()));
-        }
-        try {
-            if (!plugin.getDataFolder().exists() && !plugin.getDataFolder().mkdirs()) {
-                plugin.getLogger().warning("Could not create the plugin data folder.");
+        synchronized (saveLock) {
+            YamlConfiguration yaml = new YamlConfiguration();
+            for (PlayerData data : cache.values()) {
+                data.write(yaml.createSection(ROOT + "." + data.uuid()));
             }
-            yaml.save(file);
-        } catch (IOException exception) {
-            plugin.getLogger().severe("Failed to save player data: " + exception.getMessage());
+            try {
+                if (!plugin.getDataFolder().exists() && !plugin.getDataFolder().mkdirs()) {
+                    plugin.getLogger().warning("Could not create the plugin data folder.");
+                }
+                yaml.save(file);
+            } catch (IOException exception) {
+                plugin.getLogger().severe("Failed to save player data: " + exception.getMessage());
+            }
         }
     }
 

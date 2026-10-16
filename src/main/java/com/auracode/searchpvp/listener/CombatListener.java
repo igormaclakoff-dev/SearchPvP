@@ -5,6 +5,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -34,6 +36,22 @@ public final class CombatListener implements Listener {
         }
         event.deathMessage(null);
         plugin.getMatchManager().handleDeath(victim);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player victim
+                && plugin.getMatchManager().isCountingDown(victim.getUniqueId())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onDamageByEntity(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player attacker
+                && plugin.getMatchManager().isCountingDown(attacker.getUniqueId())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -111,6 +111,8 @@ public final class SearchPvPPlugin extends JavaPlugin {
         reloadConfig();
         this.pluginConfig = new PluginConfig(getConfig());
         this.messages.reload();
+        this.matchmakingManager.start();
+        this.seasonManager.reload();
     }
 
     public void setPlacementCommand(String value) {

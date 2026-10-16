@@ -23,14 +23,22 @@ public final class ArenaManager {
 
     public World arenaWorld() {
         World world = plugin.getServer().getWorld(plugin.getPluginConfig().getArenaWorld());
-        return world != null ? world : plugin.getServer().getWorlds().get(0);
+        if (world != null) {
+            return world;
+        }
+        List<World> worlds = plugin.getServer().getWorlds();
+        return worlds.isEmpty() ? null : worlds.get(0);
     }
 
     /**
-     * @return two spawn locations for the fighters (adjacent when same-location is enabled).
+     * @return two spawn locations for the fighters (adjacent when same-location is enabled),
+     *         or an empty list when no world is available to host the arena.
      */
     public List<Location> spawnLocations() {
         PluginConfig config = plugin.getPluginConfig();
+        if (arenaWorld() == null) {
+            return List.of();
+        }
         Location first = randomSurfaceLocation();
         if (config.isSameLocation()) {
             Location second = first.clone().add(config.getSpawnOffset(), 0, 0);

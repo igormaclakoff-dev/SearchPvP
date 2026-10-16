@@ -1,6 +1,7 @@
 package com.auracode.searchpvp.listener;
 
 import com.auracode.searchpvp.SearchPvPPlugin;
+import com.auracode.searchpvp.util.PlayerState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +23,8 @@ public final class PlayerConnectionListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         plugin.getDataManager().getOrCreate(player.getUniqueId(), player.getName());
+        PlayerState.setInMatch(player, false);
+        PlayerState.setInQueue(player, false);
     }
 
     @EventHandler

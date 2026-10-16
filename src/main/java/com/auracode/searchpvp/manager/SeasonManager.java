@@ -23,10 +23,11 @@ public final class SeasonManager {
 
     private final SearchPvPPlugin plugin;
     private final File file;
-    private final long seasonLengthMillis;
 
+    private long seasonLengthMillis;
     private int season = 1;
     private long seasonStart = System.currentTimeMillis();
+    private int lastRewardedSeason;
     private long lastAnnouncedBucket = Long.MIN_VALUE;
     private boolean ending;
     private BukkitTask task;
@@ -34,12 +35,23 @@ public final class SeasonManager {
     public SeasonManager(SearchPvPPlugin plugin) {
         this.plugin = plugin;
         this.file = new File(plugin.getDataFolder(), "season.yml");
-        this.seasonLengthMillis = TimeUnit.DAYS.toMillis(plugin.getPluginConfig().getSeasonLengthDays());
+        this.seasonLengthMillis = plugin.getPluginConfig().getSeasonLengthDays() * FINAL_DAY_MILLIS;
         load();
     }
 
     public void start() {
+        if (task != null) {
+            task.cancel();
+        }
         task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, TICK_DELAY_TICKS, TICK_INTERVAL_TICKS);
+    }
+
+    /**
+     * Re-applies timing-related settings after a configuration reload.
+     */
+    public void reload() {
+        this.seasonLengthMillis = plugin.getPluginConfig().getSeasonLengthDays() * FINAL_DAY_MILLIS;
+        this.lastAnnouncedBucket = Long.MIN_VALUE;
     }
 
     public void shutdown() {
@@ -57,6 +69,7 @@ public final class SeasonManager {
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
         this.season = yaml.getInt("season", 1);
         this.seasonStart = yaml.getLong("season-start", System.currentTimeMillis());
+        this.lastRewardedSeason = yaml.getInt("last-rewarded-season", this.season - 1);
     }
 
     private void tick() {
@@ -92,7 +105,8 @@ public final class SeasonManager {
         plugin.getMessages().broadcast("season.ended-header", Placeholders.of().set("season", finished).build());
         plugin.getMessages().broadcast("season.ended-title", Placeholders.of().set("season", finished).build());
 
-        if (top.isEmpty()) {
+        boolean rewardable = finished > lastRewardedSeason && hasPlayed(top);
+        if (top.isEmpty() || !rewardable) {
             plugin.getMessages().broadcast("season.ended-empty", Placeholders.of().set("season", finished).build());
         } else {
             int place = 1;
@@ -108,6 +122,8 @@ public final class SeasonManager {
                 plugin.getRewardManager().grant(place, data.name(), data.elo());
                 place++;
             }
+            lastRewardedSeason = finished;
+            save();
         }
 
         startNewSeason();
@@ -153,10 +169,21 @@ public final class SeasonManager {
         return plugin.getMessages().duration(millisLeft());
     }
 
+    private boolean hasPlayed(List<PlayerData> top) {
+        int starting = plugin.getPluginConfig().getStartingElo();
+        for (PlayerData data : top) {
+            if (data.matches() > 0 || data.elo() != starting) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void save() {
         YamlConfiguration yaml = new YamlConfiguration();
         yaml.set("season", season);
         yaml.set("season-start", seasonStart);
+        yaml.set("last-rewarded-season", lastRewardedSeason);
         try {
             yaml.save(file);
         } catch (IOException exception) {

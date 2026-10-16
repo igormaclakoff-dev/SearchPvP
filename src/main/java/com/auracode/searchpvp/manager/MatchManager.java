@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,12 +27,13 @@ import java.util.concurrent.CompletableFuture;
  */
 public final class MatchManager {
 
-    private static final long RESPAWN_RETURN_DELAY_TICKS = 40L;
+    private static final long RESPAWN_RETURN_DELAY_TICKS = 200L;
 
     private final SearchPvPPlugin plugin;
     private final Map<UUID, Match> matches = new HashMap<>();
     private final Set<UUID> frozen = new HashSet<>();
     private final Map<UUID, Location> pendingRespawns = new HashMap<>();
+    private final Set<BukkitTask> delayedTasks = new HashSet<>();
 
     public MatchManager(SearchPvPPlugin plugin) {
         this.plugin = plugin;
@@ -49,8 +51,17 @@ public final class MatchManager {
         return frozen.contains(uuid);
     }
 
+    public boolean isCountingDown(UUID uuid) {
+        Match match = matches.get(uuid);
+        return match != null && match.isCountingDown();
+    }
+
     public Location consumePendingRespawn(UUID uuid) {
         return pendingRespawns.remove(uuid);
+    }
+
+    public void clearPendingRespawn(UUID uuid) {
+        pendingRespawns.remove(uuid);
     }
 
     /**
@@ -76,6 +87,11 @@ public final class MatchManager {
                 Placeholders.of().set("first", first.getName()).set("second", second.getName()).build());
 
         List<Location> spawns = plugin.getArenaManager().spawnLocations();
+        if (spawns.size() < 2) {
+            plugin.getLogger().severe("Cannot start a duel: the arena requires at least two spawn points.");
+            finish(match, null, null, FinishReason.ABORTED);
+            return;
+        }
         CompletableFuture<Boolean> firstFuture = first.teleportAsync(spawns.get(0));
         CompletableFuture<Boolean> secondFuture = second.teleportAsync(spawns.get(1));
         CompletableFuture.allOf(firstFuture, secondFuture)
@@ -108,10 +124,10 @@ public final class MatchManager {
         plugin.getMessages().title(first, "match.countdown", "match.countdown-sub", placeholders, 900L);
         plugin.getMessages().title(second, "match.countdown", "match.countdown-sub", placeholders, 900L);
         if (remaining <= 1) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> beginFight(match), 20L);
+            schedule(() -> beginFight(match), 20L);
             return;
         }
-        Bukkit.getScheduler().runTaskLater(plugin, () -> runCountdown(match, remaining - 1), 20L);
+        schedule(() -> runCountdown(match, remaining - 1), 20L);
     }
 
     private void beginFight(Match match) {
@@ -151,17 +167,21 @@ public final class MatchManager {
         Player second = Bukkit.getPlayer(match.secondId());
         if (first != null) {
             PlayerState.setInMatch(first, false);
+            applyExitMode(first);
         }
         if (second != null) {
             PlayerState.setInMatch(second, false);
+            applyExitMode(second);
         }
 
-        RatingResult rating = null;
-        if (reason.isRanked() && winnerId != null && loserId != null) {
-            rating = applyRating(match, winnerId, loserId, reason);
+        boolean ranked = reason.isRanked() && winnerId != null && loserId != null;
+        if (ranked && reason == FinishReason.QUIT
+                && System.currentTimeMillis() - match.startedAt() < plugin.getPluginConfig().getMinRankMillis()) {
+            ranked = false;
         }
+        RatingResult rating = ranked ? applyRating(match, winnerId, loserId, reason) : null;
 
-        cleanupTeleport(match, winnerId, loserId);
+        cleanupTeleport(match, loserId);
 
         if (reason == FinishReason.ADMIN || reason == FinishReason.ABORTED) {
             plugin.getMessages().send(first, "match.aborted");
@@ -193,30 +213,55 @@ public final class MatchManager {
         return new RatingResult(updated[0], updated[1], winnerDelta, loserDelta);
     }
 
-    private void cleanupTeleport(Match match, UUID winnerId, UUID loserId) {
+    /**
+     * Returns every online participant to their pre-match location. The loser is
+     * handed off to {@code PlayerRespawnEvent}; the other fighter is moved immediately.
+     */
+    private void cleanupTeleport(Match match, UUID loserId) {
         if (!plugin.getPluginConfig().isReturnToOrigin()) {
             return;
         }
-        if (winnerId != null) {
-            Player winner = Bukkit.getPlayer(winnerId);
-            if (winner != null) {
-                teleportBack(winner, match.returnLocation(winnerId));
+        for (UUID id : List.of(match.firstId(), match.secondId())) {
+            Location location = match.returnLocation(id);
+            if (location == null) {
+                continue;
+            }
+            Player player = Bukkit.getPlayer(id);
+            if (player == null) {
+                continue;
+            }
+            if (id.equals(loserId)) {
+                pendingRespawns.put(id, location);
+                schedule(() -> {
+                    if (pendingRespawns.containsKey(id) && player.isOnline() && !player.isDead()) {
+                        pendingRespawns.remove(id);
+                        teleportBack(player, location);
+                    }
+                }, RESPAWN_RETURN_DELAY_TICKS);
+            } else {
+                teleportBack(player, location);
             }
         }
-        if (loserId != null) {
-            Player loser = Bukkit.getPlayer(loserId);
-            Location location = match.returnLocation(loserId);
-            if (location != null) {
-                if (loser != null) {
-                    pendingRespawns.put(loserId, location);
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        if (loser.isOnline() && plugin.getMatchManager().consumePendingRespawn(loserId) != null) {
-                            teleportBack(loser, location);
-                        }
-                    }, RESPAWN_RETURN_DELAY_TICKS);
-                }
-            }
+    }
+
+    private void applyExitMode(Player player) {
+        if (player == null) {
+            return;
         }
+        String command = plugin.getPluginConfig().getExitCommand();
+        if (command == null || command.isBlank()) {
+            return;
+        }
+        dispatchConsole(applyPlaceholders(command, player.getName(), null));
+    }
+
+    private void schedule(Runnable action, long delayTicks) {
+        BukkitTask[] holder = new BukkitTask[1];
+        holder[0] = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            delayedTasks.remove(holder[0]);
+            action.run();
+        }, delayTicks);
+        delayedTasks.add(holder[0]);
     }
 
     private void teleportBack(Player player, Location location) {
@@ -297,6 +342,7 @@ public final class MatchManager {
     }
 
     public void handleQuit(Player player) {
+        clearPendingRespawn(player.getUniqueId());
         Match match = matches.get(player.getUniqueId());
         if (match == null) {
             return;
@@ -334,6 +380,10 @@ public final class MatchManager {
         frozen.clear();
         matches.clear();
         pendingRespawns.clear();
+        for (BukkitTask task : delayedTasks) {
+            task.cancel();
+        }
+        delayedTasks.clear();
     }
 
     private record RatingResult(int winnerElo, int loserElo, int winnerDelta, int loserDelta) {

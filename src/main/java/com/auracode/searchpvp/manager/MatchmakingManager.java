@@ -33,6 +33,9 @@ public final class MatchmakingManager {
     }
 
     public void start() {
+        if (task != null) {
+            task.cancel();
+        }
         long interval = plugin.getPluginConfig().getMatchmakingIntervalTicks();
         this.task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, interval, interval);
     }

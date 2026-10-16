@@ -27,10 +27,12 @@ public final class PluginConfig {
     private final int eloKFactor;
     private final int seasonLengthDays;
     private final int countdownSeconds;
+    private final int minRankSeconds;
     private final boolean returnToOrigin;
     private final boolean keepInventory;
     private final String winCommand;
     private final String loseCommand;
+    private final String exitCommand;
 
     public PluginConfig(FileConfiguration config) {
         this.placementCommand = config.getString("settings.placement-command", "");
@@ -47,10 +49,12 @@ public final class PluginConfig {
         this.eloKFactor = Math.max(1, config.getInt("elo.k-factor", 32));
         this.seasonLengthDays = Math.max(1, config.getInt("season.length-days", 30));
         this.countdownSeconds = Math.max(0, config.getInt("match.countdown-seconds", 3));
+        this.minRankSeconds = Math.max(0, config.getInt("match.min-rank-seconds", 15));
         this.returnToOrigin = config.getBoolean("match.return-to-origin", true);
         this.keepInventory = config.getBoolean("match.keep-inventory", true);
         this.winCommand = config.getString("rewards.win-command", "");
         this.loseCommand = config.getString("rewards.lose-command", "");
+        this.exitCommand = config.getString("rewards.exit-command", "");
     }
 
     private static EnumSet<ArmorTier> parseTiers(List<String> raw) {
@@ -124,6 +128,14 @@ public final class PluginConfig {
         return countdownSeconds;
     }
 
+    public int getMinRankSeconds() {
+        return minRankSeconds;
+    }
+
+    public long getMinRankMillis() {
+        return minRankSeconds * 1000L;
+    }
+
     public boolean isReturnToOrigin() {
         return returnToOrigin;
     }
@@ -138,5 +150,9 @@ public final class PluginConfig {
 
     public String getLoseCommand() {
         return loseCommand;
+    }
+
+    public String getExitCommand() {
+        return exitCommand;
     }
 }
